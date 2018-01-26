@@ -87,7 +87,7 @@ node {
         sh """
           docker-compose exec -T exchange \
             /bin/bash -c '[[ ! \$(python manage.py makemigrations --dry-run) == "No changes detected" ]] && \
-                          echo "failed" && exit 1'
+                          python manage.py makemigrations --dry-run --verbosity 3 && exit 1'
         """
       }
 
