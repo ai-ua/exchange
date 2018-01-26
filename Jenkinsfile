@@ -6,55 +6,95 @@ node {
     try {
       stage('Checkout'){
         checkout scm
-        // pull in submodules
         sh """
           git submodule update --init
           echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
         """
+        checkout([$class: 'GitSCM',
+                  branches: [[name: '*/master']],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions: [[$class: 'RelativeTargetDirectory',
+                                relativeTargetDir: './vendor/exchange-mobile-extension']],
+                  submoduleCfg: [],
+                  userRemoteConfigs: [[credentialsId: 'BoundlessAdminGitHub',
+                                       url: 'https://github.com/boundlessgeo/exchange-mobile-extension.git']]])
+        sh """
+          # https://issues.jenkins-ci.org/browse/JENKINS-44909
+          rm -r vendor/exchange-mobile-extension@tmp
+        """
       }
 
-      stage('Linter'){
+      stage('Setup'){
         sh """
-          docker run -v \$(pwd -P):/code \
-                     -w /code quay.io/boundlessgeo/sonar-maven-py3-alpine bash \
-                     -e -c '. docker/devops/helper.sh && lint'
-          """
-      }
-
-      stage('Set-Up'){
-        // ensure docker volumes are cleared, build, wait for startup
-        sh """
-          docker-compose down
-          docker rm -f \$(docker ps -aq) || echo "no containers to remove"
-          docker system prune -f
-          docker run -v \$(pwd -P):/code \
-	            -w /code quay.io/boundlessgeo/bex-nodejs-bower-grunt bash \
-	            -e -c '. docker/devops/helper.sh && build-maploom'
-          docker-compose up --build --force-recreate -d
-          echo "Waiting for exchange to finish loading"
-          curl http://ron-swanson-quotes.herokuapp.com/v2/quotes || echo "API is down"
-          """
-      }
-
-      stage('Exchange-Healthcheck'){
-        sh """
-          /bin/bash -c ". docker/devops/helper.sh && exchange-healthcheck"
-          """
-      }
-
-      stage('Unit-Tests'){
-         // test
-        sh """
-          docker exec exchange /bin/bash -c /code/docker/exchange/run_tests.sh
-          """
-      }
-
-      stage('Tear-Down'){
-        // cleanup volumes
-        sh """
+          docker pull 'quay.io/boundlessgeo/sonar-maven-py3-alpine'
           docker-compose down
           docker system prune -f
-          """
+        """
+      }
+
+      stage('Style Checks'){
+        parallel (
+            "pycodestyle" : {
+              bashDocker(
+                'quay.io/boundlessgeo/sonar-maven-py3-alpine',
+                'pycodestyle exchange --ignore=E722,E731'
+              )
+            },
+            "yamllint" : {
+              bashDocker(
+                'quay.io/boundlessgeo/sonar-maven-py3-alpine',
+                'yamllint -d "{extends: relaxed, rules: {line-length: {max: 120}}}" $(find . -name "*.yml" -not -path "./vendor/*")'
+              )
+            },
+            "flake8" : {
+              bashDocker(
+                'quay.io/boundlessgeo/sonar-maven-py3-alpine',
+                'flake8 --ignore=F405,E722,E731 exchange'
+              )
+            }
+        )
+      }
+
+      stage('Build'){
+        parallel (
+          "maploom" : {
+            bashDocker(
+              'quay.io/boundlessgeo/bex-nodejs-bower-grunt',
+              '. docker/devops/helper.sh && build-maploom'
+            )
+          },
+          "bex" : {
+            sh """
+              docker rm -f \$(docker ps -aq) || echo "no containers to remove"
+              docker-compose up --build --force-recreate -d
+            """
+            timeout(time: 10, unit: 'MINUTES')  {
+              waitUntil {
+                script {
+                  def r = sh script: 'wget -q http://localhost -O /dev/null', returnStatus: true
+                  return (r == 0);
+                }
+              }
+            }
+          }
+        )
+        sh """
+          docker-compose logs
+        """
+      }
+
+      stage('Verify Migrations'){
+        sh """
+          docker-compose exec -T exchange \
+            /bin/bash -c '[[ ! \$(python manage.py makemigrations --dry-run) == "No changes detected" ]] && \
+                          echo "failed" && exit 1'
+        """
+      }
+
+      stage('py.test'){
+        sh """
+          docker-compose exec -T exchange /bin/bash -c '/code/docker/exchange/run_tests.sh'
+        """
       }
 
       if (env.BRANCH_NAME == 'master') {
@@ -77,7 +117,11 @@ node {
     } finally {
       // Success or failure, always send notifications
       echo currentBuild.result
-      notifyBuild(currentBuild.result)
+      sh """
+        docker-compose down
+        docker system prune -f
+        """
+      // notifyBuild(currentBuild.result)
     }
 
   }
@@ -85,7 +129,6 @@ node {
 
 
 // Slack Integration
-
 def notifyBuild(String buildStatus = currentBuild.result) {
 
   // generate a custom url to use the blue ocean endpoint
@@ -105,5 +148,5 @@ def notifyBuild(String buildStatus = currentBuild.result) {
   }
 
   // Send notifications
-  slackSend (color: colorCode, message: summary, channel: '#exchange-bots')
+  // slackSend (color: colorCode, message: summary, channel: '#exchange-bots')
 }
