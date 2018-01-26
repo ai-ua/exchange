@@ -205,16 +205,17 @@ def get_facet_results(aggregations, parameters):
 
             for bucket in buckets:
                 bucket_key = bucket.key
-                bucket_count = bucket.doc_count
-                bucket_dict = {
-                    'global_count': bucket_count,
-                    'count': 0,
-                    'display': bucket.key
-                }
-                if lookup:
-                    if bucket_key in lookup:
-                        bucket_dict.update(lookup[bucket_key])
-                facet_results[k]['facets'][bucket_key] = bucket_dict
+                if bucket_key != '':
+                    bucket_count = bucket.doc_count
+                    bucket_dict = {
+                        'global_count': bucket_count,
+                        'count': 0,
+                        'display': bucket.key
+                    }
+                    if lookup:
+                        if bucket_key in lookup:
+                            bucket_dict.update(lookup[bucket_key])
+                    facet_results[k]['facets'][bucket_key] = bucket_dict
 
     return facet_results
 
