@@ -1,5 +1,5 @@
 --index-url https://pypi.python.org/simple/
-
+-e ./vendor/geonode
 git+https://github.com/MapStory/composer.git@master#composer
 git+https://github.com/GeoNode/django-osgeo-importer@angular-1.6#egg=django-osgeo-importer
 git+https://github.com/boundlessgeo/sphinx@bex#egg=Sphinx
