@@ -199,6 +199,11 @@ INSTALLED_APPS = (
     'social_django',
 ) + ADDITIONAL_APPS + INSTALLED_APPS
 
+MIGRATION_MODULES = {
+    'account': 'exchange.3pm.account',
+    'user_messages': 'exchange.3pm.user_messages',
+}
+
 if OSGEO_IMPORTER_ENABLED:
     INSTALLED_APPS = ('osgeo_importer',) + INSTALLED_APPS
 else:
