@@ -1,10 +1,9 @@
 from . import ExchangeTest
-from elasticsearch_dsl.connections import connections
+from elasticsearch_dsl import connections
 from django.conf import settings
 from elasticsearch import Elasticsearch
 import pytest
 from django.core.management import call_command
-import subprocess
 
 
 @pytest.mark.skipif(settings.ES_SEARCH is False,
@@ -57,549 +56,772 @@ class GeonodeElasticsearchTest(ExchangeTest):
         mappings = es.indices.get_mapping()
 
         profile_mappings = mappings[
-            'profile-index']['mappings']['profile_index']['properties']
+            'profile-index']['mappings']['doc']['properties']
         profile_properties = {
-            u'first_name': {
-                u'type': u'string',
-                u'analyzer': u'snowball'
+            "first_name": {
+                "type": "text"
             },
-            u'id': {
-                u'type': u'integer'
+            "id": {
+                "type": "integer"
             },
-            u'last_name': {
-                u'type': u'string',
-                u'analyzer': u'snowball'
+            "last_name": {
+                "type": "text"
             },
-            u'organization': {
-                u'type': u'string',
-                u'analyzer': u'snowball'
+            "organization": {
+                "type": "text"
             },
-            u'position': {
-                u'type': u'string',
-                u'analyzer': u'snowball'
+            "position": {
+                "type": "keyword"
             },
-            u'profile': {
-                u'type': u'string',
-                u'analyzer': u'snowball'
+            "profile": {
+                "type": "keyword"
             },
-            u'type': {
-                u'type': u'string',
-                u'analyzer': u'snowball'
+            "type": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            u'username': {
-                u'type': u'string',
-                u'analyzer': u'snowball'
+            "username": {
+                "type": "text"
             }
         }
-        print profile_mappings
-        print profile_properties
         self.assertDictEqual(profile_mappings, profile_properties)
 
         group_mappings = mappings[
-            'group-index']['mappings']['group_index']['properties']
+            'group-index']['mappings']['doc']['properties']
         group_properties = {
-            'description': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "description": {
+                "type": "text"
             },
-            'id': {
-                'type': 'integer'
+            "id": {
+                "type": "integer"
             },
-            'json': {
-                'type': 'string'
+            "json": {
+                "type": "text"
             },
-            'title': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "title": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "pattern": {
+                        "analyzer": "pattern_analyzer",
+                        "type": "text"
+                    }
+                },
+                "type": "text"
             },
-            'title_sortable': {
-                'type': 'string'
+            "title_sortable": {
+                "type": "keyword"
             },
-            'type': {
-                'type': 'string',
-                'analyzer': 'snowball'
-            },
+            "type": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
+            }
         }
         self.assertDictEqual(group_mappings, group_properties)
 
         document_mappings = mappings[
-            'document-index']['mappings']['document_index']['properties']
+            'document-index']['mappings']['doc']['properties']
         document_properties = {
-            'abstract': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "abstract": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "pattern": {
+                        "analyzer": "pattern_analyzer",
+                        "type": "text"
+                    }
+                },
+                "type": "text"
             },
-            'bbox_bottom': {
-                'type': 'float'
+            "bbox_bottom": {
+                "type": "float"
             },
-            'bbox_left': {
-                'type': 'float'
+            "bbox_left": {
+                "type": "float"
             },
-            'bbox_right': {
-                'type': 'float'
+            "bbox_right": {
+                "type": "float"
             },
-            'bbox_top': {
-                'type': 'float'
+            "bbox_top": {
+                "type": "float"
             },
-            'category': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "category": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'category__gn_description': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "category__gn_description": {
+                "type": "text"
             },
-            'csw_type': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "csw_type": {
+                "type": "keyword"
             },
-            'csw_wkt_geometry': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "csw_wkt_geometry": {
+                "type": "keyword"
             },
-            'date': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "date": {
+                "type": "date"
             },
-            'detail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "detail_url": {
+                "type": "keyword"
             },
-            'id': {
-                'type': 'integer'
+            "id": {
+                "type": "integer"
             },
-            'keywords': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "keywords": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'num_comments': {
-                'type': 'integer'
+            "num_comments": {
+                "type": "integer"
             },
-            'num_ratings': {
-                'type': 'integer'
+            "num_ratings": {
+                "type": "integer"
             },
-            'owner__username': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "owner__username": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'popular_count': {
-                'type': 'integer'
+            "popular_count": {
+                "type": "integer"
             },
-            'rating': {
-                'type': 'integer'
+            "rating": {
+                "type": "integer"
             },
-            'regions': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "regions": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'share_count': {
-                'type': 'integer'
+            "share_count": {
+                "type": "integer"
             },
-            'srid': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "srid": {
+                "type": "keyword"
             },
-            'supplemental_information': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "supplemental_information": {
+                "type": "text"
             },
-            'temporal_extent_end': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "temporal_extent_end": {
+                "type": "date"
             },
-            'temporal_extent_start': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "temporal_extent_start": {
+                "type": "date"
             },
-            'thumbnail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "thumbnail_url": {
+                "type": "keyword"
             },
-            'title': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "title": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "pattern": {
+                        "analyzer": "pattern_analyzer",
+                        "type": "text"
+                    }
+                },
+                "type": "text"
             },
-            'title_sortable': {
-                'type': 'string'
+            "title_sortable": {
+                "type": "keyword"
             },
-            'type': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "type": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'uuid': {
-                'type': 'string',
-                'analyzer': 'snowball'
-            },
+            "uuid": {
+                "type": "keyword"
+            }
         }
         self.assertDictEqual(document_mappings, document_properties)
 
         layer_mappings = mappings[
-            'layer-index']['mappings']['layer_index']['properties']
+            'layer-index']['mappings']['doc']['properties']
         layer_properties = {
-            'abstract': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "rating": {
+                "type": "integer"
             },
-            'bbox_bottom': {
-                'type': 'float'
+            "owner__last_name": {
+                "type": "text"
             },
-            'bbox_left': {
-                'type': 'float'
+            "has_time": {
+                "type": "boolean"
             },
-            'bbox_right': {
-                'type': 'float'
+            "bbox_top": {
+                "type": "float"
             },
-            'bbox_top': {
-                'type': 'float'
+            "category__gn_description": {
+                "type": "text"
             },
-            'category': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "temporal_extent_end": {
+                "type": "date"
             },
-            'category__gn_description': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "abstract": {
+                "fields": {
+                    "pattern": {
+                        "type": "text",
+                        "analyzer": "pattern_analyzer"
+                    },
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                },
+                "type": "text"
             },
-            'csw_type': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "srid": {
+                "type": "keyword"
             },
-            'csw_wkt_geometry': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "bbox_bottom": {
+                "type": "float"
             },
-            'date': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "bbox_right": {
+                "type": "float"
             },
-            'detail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "keywords": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    },
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                },
+                "type": "keyword"
             },
-            'featured': {
-                'type': 'boolean'
+            "featured": {
+                "type": "boolean"
             },
-            'geogig_link': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "thumbnail_url": {
+                "type": "keyword"
             },
-            'has_time': {
-                'type': 'boolean'
+            "references": {
+                "properties": {
+                    "url": {
+                        "type": "text"
+                    },
+                    "scheme": {
+                        "fields": {
+                            "pattern": {
+                                "type": "text",
+                                "analyzer": "pattern_analyzer"
+                            },
+                            "text": {
+                                "type": "text"
+                            }
+                        },
+                        "type": "keyword"
+                    },
+                    "name": {
+                        "fields": {
+                            "text": {
+                                "type": "text"
+                            }
+                        },
+                        "type": "keyword"
+                    }
+                }
             },
-            'id': {
-                'type': 'integer'
+            "type": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    },
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                },
+                "type": "keyword"
             },
-            'is_published': {
-                'type': 'boolean'
+            "date": {
+                "type": "date"
             },
-            'keywords': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "owner__first_name": {
+                "type": "text"
             },
-            'num_comments': {
-                'type': 'integer'
+            "detail_url": {
+                "type": "keyword"
             },
-            'num_ratings': {
-                'type': 'integer'
+            "id": {
+                "type": "integer"
             },
-            'owner__first_name': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "category": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    },
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                },
+                "type": "keyword"
             },
-            'owner__last_name': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "num_ratings": {
+                "type": "integer"
             },
-            'owner__username': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "uuid": {
+                "type": "keyword"
             },
-            'popular_count': {
-                'type': 'integer'
+            "title": {
+                "fields": {
+                    "pattern": {
+                        "type": "text",
+                        "analyzer": "pattern_analyzer"
+                    },
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                },
+                "type": "text"
             },
-            'rating': {
-                'type': 'integer'
+            "num_comments": {
+                "type": "integer"
             },
-            'regions': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "title_sortable": {
+                "type": "keyword"
             },
-            'share_count': {
-                'type': 'integer'
+            "supplemental_information": {
+                "type": "text"
             },
-            'srid': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "bbox_left": {
+                "type": "float"
             },
-            'subtype': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "temporal_extent_start": {
+                "type": "date"
             },
-            'supplemental_information': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "regions": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    },
+                    "english": {
+                        "type": "text",
+                        "analyzer": "english"
+                    }
+                },
+                "type": "keyword"
             },
-            'temporal_extent_end': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "subtype": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'temporal_extent_start': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "source_host": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'thumbnail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "csw_type": {
+                "type": "keyword"
             },
-            'title': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "typename": {
+                "type": "keyword"
             },
-            'title_sortable': {
-                'type': 'string'
+            "csw_wkt_geometry": {
+                "type": "keyword"
             },
-            'type': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "share_count": {
+                "type": "integer"
             },
-            'typename': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "owner__username": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'uuid': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "popular_count": {
+                "type": "integer"
             },
+            "geogig_link": {
+                "type": "keyword"
+            },
+            "is_published": {
+                "type": "boolean"
+            }
         }
         self.assertDictEqual(layer_mappings, layer_properties)
 
         map_mappings = mappings[
-            'map-index']['mappings']['map_index']['properties']
+            'map-index']['mappings']['doc']['properties']
         map_properties = {
-            'abstract': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "abstract": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "pattern": {
+                        "analyzer": "pattern_analyzer",
+                        "type": "text"
+                    }
+                },
+                "type": "text"
             },
-            'bbox_bottom': {
-                'type': 'float'
+            "bbox_bottom": {
+                "type": "float"
             },
-            'bbox_left': {
-                'type': 'float'
+            "bbox_left": {
+                "type": "float"
             },
-            'bbox_right': {
-                'type': 'float'
+            "bbox_right": {
+                "type": "float"
             },
-            'bbox_top': {
-                'type': 'float'
+            "bbox_top": {
+                "type": "float"
             },
-            'category': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "category": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'category__gn_description': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "category__gn_description": {
+                "type": "text"
             },
-            'csw_type': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "csw_type": {
+                "type": "keyword"
             },
-            'csw_wkt_geometry': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "csw_wkt_geometry": {
+                "type": "keyword"
             },
-            'date': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "date": {
+                "type": "date"
             },
-            'detail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "detail_url": {
+                "type": "keyword"
             },
-            'id': {
-                'type': 'integer'
+            "id": {
+                "type": "integer"
             },
-            'keywords': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "keywords": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'num_comments': {
-                'type': 'integer'
+            "num_comments": {
+                "type": "integer"
             },
-            'num_ratings': {
-                'type': 'integer'
+            "num_ratings": {
+                "type": "integer"
             },
-            'owner__username': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "owner__username": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'popular_count': {
-                'type': 'integer'
+            "popular_count": {
+                "type": "integer"
             },
-            'rating': {
-                'type': 'integer'
+            "rating": {
+                "type": "integer"
             },
-            'regions': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "regions": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'share_count': {
-                'type': 'integer'
+            "share_count": {
+                "type": "integer"
             },
-            'srid': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "srid": {
+                "type": "keyword"
             },
-            'supplemental_information': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "supplemental_information": {
+                "type": "text"
             },
-            'temporal_extent_end': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "temporal_extent_end": {
+                "type": "date"
             },
-            'temporal_extent_start': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "temporal_extent_start": {
+                "type": "date"
             },
-            'thumbnail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "thumbnail_url": {
+                "type": "keyword"
             },
-            'title': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "title": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "pattern": {
+                        "analyzer": "pattern_analyzer",
+                        "type": "text"
+                    }
+                },
+                "type": "text"
             },
-            'title_sortable': {
-                'type': 'string'
+            "title_sortable": {
+                "type": "keyword"
             },
-            'type': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "type": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'uuid': {
-                'type': 'string',
-                'analyzer': 'snowball'
-            },
+            "uuid": {
+                "type": "keyword"
+            }
         }
         self.assertDictEqual(map_mappings, map_properties)
 
         story_mappings = mappings[
-            'story-index']['mappings']['story_index']['properties']
+            'story-index']['mappings']['doc']['properties']
         story_properties = {
-            'abstract': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "abstract": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "pattern": {
+                        "analyzer": "pattern_analyzer",
+                        "type": "text"
+                    }
+                },
+                "type": "text"
             },
-            'bbox_bottom': {
-                'type': 'float'
+            "bbox_bottom": {
+                "type": "float"
             },
-            'bbox_left': {
-                'type': 'float'
+            "bbox_left": {
+                "type": "float"
             },
-            'bbox_right': {
-                'type': 'float'
+            "bbox_right": {
+                "type": "float"
             },
-            'bbox_top': {
-                'type': 'float'
+            "bbox_top": {
+                "type": "float"
             },
-            'category': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "category": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'category__gn_description': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "category__gn_description": {
+                "type": "text"
             },
-            'date': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "date": {
+                "type": "date"
             },
-            'detail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "detail_url": {
+                "type": "keyword"
             },
-            'distribution_description': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "distribution_description": {
+                "type": "text"
             },
-            'distribution_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "distribution_url": {
+                "type": "keyword"
             },
-            'featured': {
-                'type': 'boolean'
+            "featured": {
+                "type": "boolean"
             },
-            'id': {
-                'type': 'integer'
+            "id": {
+                "type": "integer"
             },
-            'is_published': {
-                'type': 'boolean'
+            "is_published": {
+                "type": "boolean"
             },
-            'keywords': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "keywords": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'num_chapters': {
-                'type': 'integer'
+            "num_chapters": {
+                "type": "integer"
             },
-            'num_comments': {
-                'type': 'integer'
+            "num_comments": {
+                "type": "integer"
             },
-            'num_ratings': {
-                'type': 'integer'
+            "num_ratings": {
+                "type": "integer"
             },
-            'owner__first_name': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "owner__first_name": {
+                "type": "text"
             },
-            'owner__last_name': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "owner__last_name": {
+                "type": "text"
             },
-            'owner__username': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "owner__username": {
+                "fields": {
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'popular_count': {
-                'type': 'integer'
+            "popular_count": {
+                "type": "integer"
             },
-            'rating': {
-                'type': 'integer'
+            "rating": {
+                "type": "integer"
             },
-            'regions': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "regions": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'share_count': {
-                'type': 'integer'
+            "share_count": {
+                "type": "integer"
             },
-            'temporal_extent_end': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "temporal_extent_end": {
+                "type": "date"
             },
-            'temporal_extent_start': {
-                'type': 'date',
-                'format': 'strict_date_optional_time||epoch_millis'
+            "temporal_extent_start": {
+                "type": "date"
             },
-            'thumbnail_url': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "thumbnail_url": {
+                "type": "keyword"
             },
-            'title': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "title": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "pattern": {
+                        "analyzer": "pattern_analyzer",
+                        "type": "text"
+                    }
+                },
+                "type": "text"
             },
-            'title_sortable': {
-                'type': 'string'
+            "title_sortable": {
+                "type": "keyword"
             },
-            'type': {
-                'type': 'string',
-                'analyzer': 'snowball'
+            "type": {
+                "fields": {
+                    "english": {
+                        "analyzer": "english",
+                        "type": "text"
+                    },
+                    "text": {
+                        "type": "text"
+                    }
+                },
+                "type": "keyword"
             },
-            'uuid': {
-                'type': 'string',
-                'analyzer': 'snowball'
-            },
+            "uuid": {
+                "type": "keyword"
+            }
         }
         self.assertDictEqual(story_mappings, story_properties)

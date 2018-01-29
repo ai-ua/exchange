@@ -1,11 +1,9 @@
-import cStringIO
 import os
-import sys
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management import call_command, CommandError
+from django.core.management import call_command
 from django.test import TestCase, RequestFactory
 from django.utils.six import StringIO
 from exchange.themes.models import Theme

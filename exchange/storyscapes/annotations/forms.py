@@ -26,7 +26,7 @@ class MarkerForm(forms.ModelForm):
         self._my_errors = {}
         geom = self.data.get('geometry', None)
         if geom:
-            if isinstance(geom, basestring):
+            if isinstance(geom, basestring):  # noqa
                 try:
                     json.loads(geom)
                 except ValueError:
@@ -62,7 +62,7 @@ class MarkerForm(forms.ModelForm):
             parsed = None
             try:
                 parsed = parse_date_time(val)
-            except ValueError, e:
+            except ValueError as e:
                 err = str(e)
             if val is not None and parsed is None:
                 err = ('Unable to read as date : {0}, please format '

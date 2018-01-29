@@ -3,7 +3,6 @@ from django import db
 from django.conf import settings
 from osgeo_importer.handlers import ImportHandlerMixin
 from osgeo_importer.handlers import ensure_can_run
-from osgeo_importer.models import UploadLayer
 from osgeo_importer.utils import quote_ident
 from geonode.layers.models import Layer
 from osgeo_importer.handlers.geonode.backward_compatibility import set_attributes  # noqa

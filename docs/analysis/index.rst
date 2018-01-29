@@ -1,4 +1,4 @@
-Analyzing data with Exchange
+Analyzing Data with Exchange
 ============================
 
 Working within the attribute table

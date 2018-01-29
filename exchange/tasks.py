@@ -1,6 +1,5 @@
 from celery.task import task
 from celery.utils.log import get_task_logger
-from exchange.core.models import CSWRecord
 from geonode.catalogue import get_catalogue
 from xml.sax.saxutils import escape
 from geonode.services.models import Service
@@ -25,20 +24,6 @@ class Record(dict):
     max_retries=1,
 )
 def create_record(self, id):
-
-    scheme_choices = (('ESRI:AIMS--http-get-map', 'MapServer'),
-                      ('ESRI:AIMS--http-get-feature', 'FeatureServer'),
-                      ('ESRI:AIMS--http-get-image', 'ImageServer'),
-                      ('WWW:LINK-1.0-http--json', 'JSON'),
-                      ('OGC:KML', 'KML'),
-                      ('WWW:LINK-1.0-http--rss', 'RSS'),
-                      ('WWW:DOWNLOAD', 'SHAPE'),
-                      ('WWW:LINK-1.0-http--soap', 'SOAP'),
-                      ('OGC:WCS', 'WCS'),
-                      ('OGC:WFS', 'WFS'),
-                      ('OGC:CS-W', 'CSW'),
-                      ('OGC:WMS', 'WMS'),
-                      ('OGC:WPS', 'WPS'))
 
     def build_service_url(service, type):
         url = service.base_url
@@ -88,7 +73,7 @@ def create_record(self, id):
         for record in service.servicelayer_set.all():
             item = Record({
                 'uuid': record.uuid,
-                'title': record.name.encode('ascii', 'xmlcharrefreplace'),
+                'title': record.title.encode('ascii', 'xmlcharrefreplace'),
                 'creator': service.owner.username,
                 'record_type': get_types(service.type),
                 'modified': datetime.datetime.now(),

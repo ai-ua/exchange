@@ -20,7 +20,6 @@
 
 import os
 import dj_database_url
-import copy
 from ast import literal_eval as le
 from geonode.settings import *  # noqa
 from geonode.settings import (
@@ -131,6 +130,7 @@ APP_ROOT = os.path.join(LOCAL_ROOT, os.pardir)
 STATICFILES_DIRS = [
     os.path.join(APP_ROOT, "static"),
     os.path.join(APP_ROOT, "thumbnails", "static"),
+    os.path.join(APP_ROOT, "maploom", "static"),
 ] + STATICFILES_DIRS
 
 # template settings
@@ -192,7 +192,7 @@ INSTALLED_APPS = (
     'geonode.contrib.geogig',
     'geonode.contrib.slack',
     'django_classification_banner',
-    'maploom',
+    'exchange.maploom',
     'solo',
     'exchange.storyscapes',
     'composer',
@@ -322,7 +322,7 @@ REGISTRY_CAT = os.getenv('REGISTRY_CAT', 'registry')
 REGISTRY_LOCAL_URL = os.getenv('REGISTRY_LOCAL_URL', 'http://localhost:8001')
 
 # CSW settings
-CATALOGUE = {
+CATALOGUE = {  # noqa
     'default': {
         'ENGINE': 'geonode.catalogue.backends.pycsw_http',
         # The FULLY QUALIFIED base url to the CSW instance for this GeoNode

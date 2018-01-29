@@ -47,6 +47,8 @@ The local geoserver hosts layers that have been added to Exchange by other regis
 
 A remote service is a separately-hosted data service of varying type (OGC,  Esri, etc). Remote services appear within the map and in search as layers. Rather than having to re-upload the files found within a particular service to Exchange, an external service’s layers are indexed and allow the user to find them and add them to their map.
 
+**Note:** Layers with time enabled features must be added via Explore Layers or the search function from the workspace. They will not function properly if they are added directly from the map.
+
 #. Click the Add Layer :guilabel:`(+)` button in the Layers field.
 
    .. figure:: img/add-layer-bttn.png

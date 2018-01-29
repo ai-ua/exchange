@@ -5,7 +5,7 @@
 - Docker API 1.25+ (`docker version`)
 - Git
 
-Note: You will also need to append nginx to your 127.0.0.1 entry in `/etc/hosts`.
+**Note:** You will also need to append nginx to your 127.0.0.1 entry in `/etc/hosts`.
 
 ```bash
 ##
@@ -21,13 +21,33 @@ Note: You will also need to append nginx to your 127.0.0.1 entry in `/etc/hosts`
 
 The reason for this is due to osgeo_importer. It uses gsconfig which parses `workspace_style_url` from geoserver rest 
 xml atom:link, which uses the entry from global.xml. Since each application is in separate containers, localhost will 
-not work as that value. To bypass this the nginx service alias `nginx` is used. If added to youe `/etc/hosts` it will 
+not work as that value. To bypass this the nginx service alias `nginx` is used. If added to your `/etc/hosts` it will 
 resolve as localhost.
 
+
+**Note:** You will have to set `vm.max_map_count` on your host for the elasticsearch container to not 
+fail  ([elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode)).  
+On MacOS you will need to ensure that the docker process is running and then do the following:
+
+```bash
+screen ~/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/tty
+# press any key to show prompt in tty session
+sysctl -w vm.max_map_count=262144
+# in the terminal press Ctrl-a + k <-- this will kill the window
+# select y to the prompt "Really kill this window [y/n]"
+```
+
+for Linux do the following:
+
+```bash
+sudo sysctl -w vm.max_map_count=262144
+```
+ 
 #### Clone Repo
-There are two submodules in the vendor directory
+There are three submodules in the vendor directory
 - geonode
 - maploom
+- sphinx-theme (used for documentation)
 
 Run the following command to clone all repositories
 
@@ -36,11 +56,17 @@ git clone --recursive -j8 git://github.com/boundlessgeo/exchange.git
 cd exchange
 ```
 
-#### Update Repo
+#### Update submodules
+To ensure the latest version/commits are being used in all the submodules, run: 
+
 ```bash
 cd exchange
-git submodule update --init --recursive
+git submodule update --init --remote --recursive
 ```
+
+when working off a different branch on one of the submodule, you may have to specify the specific branch to follow.  
+This can be done by specifying the branch name using the ```branch``` variable in ```.gitmodules```.  
+The branch the goenode submodule follows changes over time, but is currently set to ```exchange/1.4.x```. 
 
 #### Initial Docker Setup
 This will run all the docker containers and display log output in the terminal
@@ -105,11 +131,10 @@ Docker reads from two areas for settings in this environment.
 2. docker-compose:environment:
 
 The first one id where you may need to make adjustments. The second should not require any changes. The only
-containers that utilize the `.env` file are exchange, registry and worker.
+containers that utilize the `.env` file are exchange and registry.
 
-**Note:** In the `.env` file you will see a `DEV=1` entry. The exchange/worker Dockerfile will install geonode from 
-the vendor/geonode submodule if it has any value. Placing a `DEV=` will install geonode from the 
-`requirements.txt` entry.
+**Note:** In the `.env` file you will see a `DEV=True` entry. Placing a `DEV=False` will run django using 
+waitress and setting `DEBUG = False`.
 
 #### Running Tests and Coverage
 ```bash
@@ -135,3 +160,17 @@ If you have any questions feel free to reach out in the following `Boundless` sl
 
 - `#exchange-dev` Exchange Development Team
 - `#qa-deployment` Exhange QA/Deployment (CI)
+
+#### Makefile
+Easy commands to get started
+
+```bash
+Boundless:exchange bex$ make
+  make lint     - run to lint (style check) repo
+  make html     - build sphinx documentation
+  make start    - start containers
+  make stop     - stop containers
+  make purge    - stop containers and prune volumes
+  make recreate - stop containers, prune volumes and recreate/build containers
+  make test     - run unit tests
+```

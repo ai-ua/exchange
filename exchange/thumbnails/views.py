@@ -13,11 +13,25 @@ import imghdr
 import os
 
 from .models import Thumbnail, save_thumbnail
+from geonode.documents.models import Document
 
 # cache the missing thumbnail for missing images.
 TEST_DIR = os.path.dirname(__file__)
 MISSING_THUMB = open(
     os.path.join(TEST_DIR, 'static/missing_thumb.png'), 'r').read()
+
+
+def document_thumbnail(objectId):
+    try:
+        doc = Document.objects.get(id=objectId)
+    except Document.DoesNotExist:
+        pass
+    if doc:
+        img = doc._render_thumbnail()
+        # save so not needed to generate next time
+        save_thumbnail(
+            'documents', objectId, 'image/png', img, True)
+        return img
 
 
 def thumbnail_view(request, objectType, objectId):
@@ -37,9 +51,20 @@ def thumbnail_view(request, objectType, objectId):
             return HttpResponse(thumb.thumbnail_img,
                                 content_type=thumb.thumbnail_mime)
 
+        # if the thumbnail is for a document
+        # create default thumbnail
+        if(objectType == 'documents'):
+            img = document_thumbnail(objectId)
+            return HttpResponse(img, content_type='image/png')
+
         # else return the missing thumbnail.
         return HttpResponse(MISSING_THUMB, content_type='image/png')
     elif(request.method == 'POST'):
+        # if body is 'refresh' then just create default document thumb
+        if request.body == 'refresh':
+            document_thumbnail(objectId),
+            return HttpResponse(status=201)
+
         body_len = len(request.body)
 
         # ensure the thumbnail is < 400kb.

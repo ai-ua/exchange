@@ -1,6 +1,7 @@
 from .models.base import Story
 from django.http import HttpResponse
 import json
+import logging
 
 from geonode.maps.models import Map, MapSnapshot
 from geonode.maps.views import clean_config
@@ -14,10 +15,12 @@ from django.template import RequestContext
 from geonode.utils import resolve_object
 
 from geonode.layers.views import (
-    _PERMISSION_MSG_GENERIC, _PERMISSION_MSG_VIEW, _PERMISSION_MSG_DELETE)
+    _PERMISSION_MSG_GENERIC, _PERMISSION_MSG_VIEW)
 
 _PERMISSION_MSG_LOGIN = 'You must be logged in to save this story'
 _PERMISSION_MSG_SAVE = 'You are not permitted to save or edit this story'
+
+logger = logging.getLogger(__name__)
 
 
 def save_story(request, storyid):
@@ -77,7 +80,7 @@ def new_chapter_json(request):
         try:
             body = request.body
 
-            if isinstance(body, basestring):
+            if isinstance(body, basestring):  # noqa
                 body = json.loads(body)
                 story_id = body.get('story_id', 0)
                 story_obj = Story.objects.get(id=story_id)
@@ -88,7 +91,7 @@ def new_chapter_json(request):
                 mapping.save()
 
         except Exception as e:
-            print e
+            logger.error(e)
             body = ''
 
         try:
@@ -201,7 +204,7 @@ def story_detail(
     # but do not includes admins or resource owners
     if request.user != story_obj.owner and not request.user.is_superuser:
         Story.objects.filter(
-            id=story_obj.id).update(popular_count=F('popular_count') + 1)
+            id=story_obj.id).update(popular_count=F('popular_count') + 1)  # noqa
 
     config = story_obj.viewer_json(request.user)
 

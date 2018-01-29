@@ -9,9 +9,9 @@ Styling a layer highlights different aspects of your data by changing the size, 
   * You are able to individually change the style for multiple layers on a map.
   * Due to the collaborative nature of Exchange, any saved style changes will persist for all other users.
 
-There are five available style formats in Exchange, which can help you visualize relationships between your data and the map. They will be covered individually, but they are: Simple, Unique, Graduated, Choropleth and Heatmap.
+There are two available style formats in Exchange, which can help you visualize relationships between your data and the map.
 
-You will first need to ensure your map is opened with the appropriate layer added. Some styles are better suited for point layers, while others may work better for lines or polygons. These differences will be explained in the individual sections, as well.
+You will first need to ensure your map is opened with the appropriate layer(s) added and visible.
 
 Simple
 ^^^^^^
@@ -94,105 +94,3 @@ Rules represent the breakdown of the individual values and their corresponding c
 This is what the layer looks like once the Unique style selections have been saved. Each feature is represented by a different color. The outline of the individual features is represented by the purple dashed line. Refresh the map to display the changes in the legend.
 
   .. figure:: img/unique-after.png
-
-Choropleth
-^^^^^^^^^^
-
-A Choropleth map uses variations in shading, color, or symbol placement to represent the average value of a feature in a particular area. An example of this would be using different colors to represent county crime rates within a state. Counties with higher rates might be represented in red, while those with lower averages would be yellow. The lowest average might be green.
-
-1. Click the title of the layer in the layer list to expand the layer options.
-
-2. Click the :guilabel:`Style Layer` button to open the style options.
-
-The style options will open, and default to the Simple format.
-
-3. Click the arrow next to the “Simple” header until you get to the Choropleth format options.
-
-  .. figure:: img/choropleth.png
-
-4. Under Classification, select the attribute from the pull down menu whose data will be classified by its averages.
-
-5. Choose the number of classes you want to divide your data into. The more classes you have, the more variation you’ll have in shading.
-
-**Note:** Depending on what you are classifying, too many shade variations could be difficult to view. Use the number of classes that will best represent the purpose of your map.
-
-6. Select the data classification method from the pull down menu. Each method breaks the data into different categories, which changes how the data is represented on the map. Understanding how you want to represent your data will help you select which method will work best.
-
-  .. figure:: img/choro-method.png
-
-* Natural Breaks are based on the best arrangement of values for each class. The averages of the values are used to minimize variations within the classes, while maximizing variations between the classes.
-
-* Equal Interval divides the value ranges in each category into equal sizes for each of the classes.
-
-* Quantile classifies your data into a certain number of categories with an equal number of units in each category. It tries to put the same number of features into each class, so if we had five classes, we would see nearly an equal number of features in each class.
-
-7. Select a color scale from the Color Ramp.
-
-  .. figure:: img/choro-color.png
-
-8. Select options from the Stroke pull down menus to change how the feature outline is displayed.  Select options to change the line from solid, dashed or dotted. Click the color block to select a new color.
-
-  .. figure:: img/simple-stroke.png
-
-9. If you would like to turn on an attribute label for your features, select the attribute in the pull down menu. You can also select the script, text size and color from the Label section.
-
-  .. figure:: img/simple-label.png
-
-10. Once you’ve finished making your changes, click the :guilabel:`Save Layer Changes` button for them to take effect.
-
-The following examples used the same dataset and the same number of classes (10). The data represents the population in the District of Columbia per the 2000 census, where yellow is the least populated areas and dark blue is more densely populated. You can clearly see the differences in how the data is represented by each classification method.
-
-*Natural Breaks* - This arranges the groupings so that there is less variation in each class.
-
-  .. figure:: img/choro-natural.png
-
-*Quantile* - There are approximately the same number of dark blue features as there are light yellow.
-
-  .. figure:: img/choro-quantile.png
-
-*Equal Interval* - The range of values for each class is equal. In this example, each class represents approximately 500 people.
-
-  .. figure:: img/choro-equal.png
-
-Graduated
-^^^^^^^^^
-
-A graduated map uses proportional symbol sizes to represent the differences in the value of an attribute.
-
-1. Click the title of the layer in the layer list to expand the layer options.
-
-2. Click the :guilabel:`Style Layer` button to open the style options.
-
-The style options will open, and default to the Simple format.
-
-3. Click the arrow next to the “Simple” header until you get to the Graduated format options.
-
-  .. figure:: img/graduated.png
-
-4. Under Classification, select the attribute from the pull down menu whose data will be classified by the magnitude of its value.
-
-5. Choose the number of classes for dividing your data.
-
-6. Select the data classification method from the pull down menu. Each method breaks the data into different categories, which changes how the data is represented on the map. Understanding how you want to represent your data will help you select which method will work best.
-
-  .. figure:: img/grad-method.png
-
-**Note:** Please see the above section on Choropleth maps for a full explanation of each of the methods. Graduated maps use the same methods for dividing the data.
-
-7. The Min-Max range is used to constrain the visual size for each feature cluster. Ideally,  the range should match the number of classes, but to make clusters appear bigger, select a Min-Max range that is larger than the number of classes.
-
-  .. figure:: img/grad-classification.png
-
-8. Select options from the Stroke pull down menus to change how the feature outline is displayed.  Select options to change the line from solid, dashed or dotted. Click the color block to select a new color.
-
-  .. figure:: img/simple-stroke.png
-
-9. If you would like to turn on an attribute label for your features, select the attribute in the pull down menu. You can also select the script, text size and color from the Label section.
-
-  .. figure:: img/simple-label.png
-
-10. Once you’ve finished making your changes, click the :guilabel:`Save Layer Changes` button for them to take effect.
-
-In the example below, you can see the higher concentration of features represented by the larger circles.
-
-  .. figure:: img/graduated-after.png

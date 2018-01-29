@@ -1,5 +1,4 @@
-from tastypie.authentication import (
-    BasicAuthentication, SessionAuthentication, MultiAuthentication)
+from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import BadRequest
 from tastypie.http import HttpNotFound

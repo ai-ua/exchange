@@ -2,54 +2,49 @@
 
 set -e
 
-maploom_static='/usr/local/lib/python2.7/site-packages/maploom/static/maploom'
-maploom_html='/usr/local/lib/python2.7/site-packages/maploom/templates/maps/maploom.html'
 manage='python /code/manage.py'
 setup='python /code/setup.py'
-
-if [[ $TASK != 'worker' ]]; then
-  if [[ $MAPLOOM_DEV == 1 ]]; then
-    rm -rf $maploom_static
-    mkdir -p /usr/local/lib/python2.7/site-packages/maploom/templates/maps
-    ln -s /code/vendor/maploom/build $maploom_static
-    ln -s /code/vendor/maploom/build/maploom.html $maploom_html
+maploom_static='/code/exchange/maploom/static/maploom'
+maploom_templates='/code/exchange/maploom/templates'
+# let the db intialize
+if [[ $MAPLOOM_DEV == True ]]; then
+  rm -r $maploom_static
+  ln -s /code/vendor/maploom/build $maploom_static
+  if [[ -f $maploom_templates/maps/maploom.html ]]; then
+    rm $maploom_templates/maps/maploom.html
   fi
-  # let the db intialize
-  sleep 15
-  until $manage migrate account --noinput; do
-    >&2 echo "db is unavailable - sleeping"
-    sleep 5
-  done
-  # todo: remove this when registry is removed
-  until curl -XPUT "registry:8001/catalog/registry/csw"; do
-    >&2 echo "registry is unavailable - sleeping"
-    sleep 5
-  done
-  $setup build_sphinx
-  $manage migrate --noinput
-  $manage collectstatic --noinput
-  $manage loaddata default_users
-  $manage loaddata base_resources
-  $manage loaddata /code/docker/exchange/docker_oauth_apps.json
-  $manage rebuild_index
-  pip freeze
-  # app integration
-  plugins=()
-  # anywhere integration
-  if [[ -f /code/vendor/exchange-mobile-extension/setup.py ]]; then
-     pip install /code/vendor/exchange-mobile-extension
-     $manage loaddata /code/docker/exchange/anywhere.json
-     plugins=("${plugins[@]}" "geonode_anywhere")
-  fi
-  if [[ -f /code/vendor/services/setup.py ]]; then
-    pip install /code/vendor/services
-    plugins=("${plugins[@]}" "worm")
-  fi
-  if [ "$plugins" ]; then
-    ADDITIONAL_APPS=$(IFS=,; echo "${plugins[*]}")
-  fi
-  $manage runserver 0.0.0.0:8000
-else
-  pip freeze
-  C_FORCE_ROOT=1 celery worker --app=exchange.celery_app:app -B --loglevel DEBUG
+  ln -s /code/vendor/maploom/build/maploom.html $maploom_templates/maps/maploom.html
 fi
+sleep 15
+until $manage migrate account --noinput; do
+  >&2 echo "db is unavailable - sleeping"
+  sleep 5
+done
+$setup build_sphinx
+$manage migrate --noinput
+$manage collectstatic --noinput
+$manage loaddata default_users
+$manage loaddata base_resources
+if [[ $DEV == True ]]; then
+  $manage importservice http://data-test.boundlessgeo.io/geoserver/wms bcs-hosted-data WMS I
+fi
+$manage loaddata /code/docker/exchange/docker_oauth_apps.json
+$manage rebuild_index
+pip freeze
+# app integration
+plugins=()
+# anywhere integration
+if [[ -f /code/vendor/exchange-mobile-extension/setup.py ]]; then
+   pip install /code/vendor/exchange-mobile-extension
+   $manage loaddata /code/docker/exchange/anywhere.json
+   plugins=("${plugins[@]}" "geonode_anywhere")
+fi
+if [[ -f /code/vendor/services/setup.py ]]; then
+  pip install /code/vendor/services
+  plugins=("${plugins[@]}" "worm")
+fi
+if [ "$plugins" ]; then
+  ADDITIONAL_APPS=$(IFS=,; echo "${plugins[*]}")
+fi
+echo "Dev is set to $DEV"
+supervisord -c /code/docker/exchange/supervisor.conf

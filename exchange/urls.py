@@ -18,16 +18,16 @@
 #
 #########################################################################
 
+from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.conf.urls.static import static
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from maploom.geonode.urls import urlpatterns as maploom_urls
-from fileservice.urls import urlpatterns as fileservice_urls
-from thumbnails.urls import urlpatterns as thumbnail_urls
 from geonode.urls import urlpatterns as geonode_urls
-from . import views
+from exchange.maploom.urls import urlpatterns as maploom_urls
+from fileservice.urls import urlpatterns as fileservice_urls
 from storyscapes.urls import urlpatterns as story_urls
+from thumbnails.urls import urlpatterns as thumbnail_urls
+from . import views
 
 js_info_dict = {
     'packages': ('geonode.layers',),
@@ -87,19 +87,19 @@ if 'nearsight' in settings.INSTALLED_APPS:
 # use combined registry/geonode elastic search rather than geonode search
 if settings.ES_SEARCH:
     urlpatterns += [url(r'^api/(?P<resourcetype>base)/search/$',
-                        views.elastic_search,
+                        'exchange.search.views.elastic_search',
                         name='elastic_search')]
     urlpatterns += [url(r'^api/(?P<resourcetype>documents)/search/$',
-                        views.elastic_search,
+                        'exchange.search.views.elastic_search',
                         name='elastic_search')]
     urlpatterns += [url(r'^api/(?P<resourcetype>layers)/search/$',
-                        views.elastic_search,
+                        'exchange.search.views.elastic_search',
                         name='elastic_search')]
     urlpatterns += [url(r'^api/(?P<resourcetype>maps)/search/$',
-                        views.elastic_search,
+                        'exchange.search.views.elastic_search',
                         name='elastic_search')]
     urlpatterns += [url(r'^api/(?P<resourcetype>registry)/search/$',
-                        views.elastic_search,
+                        'exchange.search.views.elastic_search',
                         name='elastic_search')]
     urlpatterns += [url(r'^autocomplete',
                         views.empty_page,
@@ -113,6 +113,6 @@ if 'worm' in settings.INSTALLED_APPS:
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += geonode_urls
-urlpatterns += maploom_urls
 urlpatterns += fileservice_urls
 urlpatterns += thumbnail_urls
+urlpatterns += maploom_urls

@@ -1,4 +1,4 @@
-Creating a story
+Creating a Story
 ================
 
 In the section Analyzing Data with Exchange, you learned how to display features with a temporal attribute, detailing the specific time an event occurred, or when a feature changed. Exchange now offers a feature that allows you to combine geographic data, text, pictures and multimedia to tell a story.

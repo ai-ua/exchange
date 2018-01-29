@@ -6,6 +6,7 @@
 import django
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 
 import os.path
 
@@ -16,6 +17,7 @@ class ExchangeTest(TestCase):
 
     def setUp(self):
         django.setup()
+        call_command('rebuild_index')
 
     def get_file_path(self, filename):
         global TESTDIR

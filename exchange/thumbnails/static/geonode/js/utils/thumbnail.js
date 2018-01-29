@@ -18,22 +18,22 @@ var refreshThumbnail = function() {
 }
 
 var createMapThumbnail = function() {
-    var canvas = $('.ol-viewport canvas');
+    var canvas = document.getElementsByTagName('canvas')[0];
 
     // first, calculate the center 'thumbnail'
     //   of the image.
     var thumb_w = 240, thumb_h = 180;
-    var w = canvas.width(), h = canvas.height();
+    var w = canvas.width, h = canvas.height; 
 
     // create a temporary canvas for the 
     //  new thumbnail.
-    var thumb_canvas = $('<canvas>').appendTo('body');
-    thumb_canvas[0].width = thumb_w;
-    thumb_canvas[0].height = thumb_h;
-    thumb_canvas[0].getContext('2d').drawImage(canvas[0], 0, 0, w, h, 0, 0, thumb_w, thumb_h);
+    var thumb_canvas = document.createElement('canvas');
+    thumb_canvas.width = thumb_w;
+    thumb_canvas.height = thumb_h;
+    thumb_canvas.getContext('2d').drawImage(canvas, 0, 0, w, h, 0, 0, thumb_w, thumb_h);
 
     // get the PNG for saving...
-    var png_data = thumb_canvas[0].toDataURL('image/png');
+    var png_data = thumb_canvas.toDataURL('image/png');
 
     // and remove the element from the DOM.
     thumb_canvas.remove();
@@ -51,6 +51,22 @@ var createMapThumbnail = function() {
     });
     return true;
 }
+
+var createDocumentThumbnail = function() {
+    var url = getThumbnailPathFromUrl();
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: 'refresh',
+        success: function(data, status, jqXHR) {
+            refreshThumbnail();
+            return true;
+        }
+    });
+    return true;
+}
+
 
 var uploadThumbnail = function(inputId) {
     var url = getThumbnailPathFromUrl();

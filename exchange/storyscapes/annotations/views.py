@@ -41,7 +41,7 @@ def _annotations_get(req, mapid):
         eidx = cols.index('end_time')
         # default csv writer chokes on unicode
         encode = lambda v: v.encode(
-            'utf-8') if isinstance(v, basestring) else str(v)
+            'utf-8') if isinstance(v, basestring) else str(v)  # noqa
         get_value = lambda a, c: getattr(
             a, c) if c not in ('start_time', 'end_time') else ''
         for a in ann:
@@ -105,7 +105,7 @@ def _annotations_post(req, mapid):
         fp = iter(req.FILES.values()).next()
         # ugh, builtin csv reader chokes on unicode
         data = unicode_csv_dict_reader(fp)
-        id_collector = lambda f: None
+        id_collector = lambda f: None  # noqa
         form_mode = 'csv'
         content_type = 'text/html'
         get_props = lambda r: r

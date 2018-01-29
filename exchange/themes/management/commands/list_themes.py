@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from exchange.themes.models import Theme
 
 
@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = 'List available themes by name and id'
 
     def handle(self, *args, **options):
-        themes = all_entries = Theme.objects.all()
+        themes = Theme.objects.all()
         self.stdout.write("Available Themes:")
 
         for theme in themes:

@@ -1,6 +1,5 @@
 from django.test import TestCase
 from exchange.core.context_processors import resource_variables
-from exchange import get_version
 from urlparse import urlparse
 
 

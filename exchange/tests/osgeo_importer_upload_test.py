@@ -2,10 +2,7 @@
 #
 #
 
-import os
 import json
-import re
-import time
 import datetime
 import pytz
 
@@ -14,9 +11,6 @@ from django.core.urlresolvers import reverse
 from . import ExchangeTest
 from osgeo_importer.tasks import import_object
 
-import pytest
-
-from exchange import settings
 import logging
 logger = logging.getLogger(__name__)
 
@@ -41,7 +35,6 @@ class UploaderMixin:
     # @return The info for the layer as a dict.
     def upload_files(self, filenames, configs=None):
 
-        from geonode.layers.models import Layer
         from osgeo_importer.models import UploadLayer
         outfiles = []
         buildconfigs = False
@@ -142,7 +135,6 @@ class UploadLayerTest(UploaderMixin, ExchangeTest):
 
     def test_temporalextent_upload(self):
         from geonode.layers.models import Layer
-        from osgeo_importer.models import UploadLayer
         files = ['./boxes_with_end_date.zip']
         configs = [
             {

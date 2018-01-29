@@ -1,7 +1,6 @@
 """
 GeoAxis OAuth2 backend:
 """
-import ssl
 import base64
 
 from social_core.backends.oauth import BaseOAuth2

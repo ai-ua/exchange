@@ -20,7 +20,7 @@ class Story(ResourceBase):
 
     def update_from_viewer(self, conf):
 
-        if isinstance(conf, basestring):
+        if isinstance(conf, basestring):  # noqa
             conf = json.loads(conf)
 
         self.title = conf['title']
@@ -229,7 +229,7 @@ class StoryChapter(db.models.Model):
 
     def update_from_viewer(self, conf):
 
-        if isinstance(conf, basestring):
+        if isinstance(conf, basestring):  # noqa
             conf = json.loads(conf)
 
         self.viewer_playbackmode = conf['viewer_playbackmode'] or 'Instant'

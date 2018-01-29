@@ -316,13 +316,23 @@
     <li class="list-group-item">
     <form>
       <div class="input-group">
+          {% if resource.storeType != "remoteStore" %}
         <input type="text" class="form-control" readonly
           value="{{ GEOSERVER_BASE_URL }}{{ resource.workspace }}/{{ resource.layer.name  }}/ows?service=wms&version=1.3.0&request=GetCapabilities" id="copy-input">
+          {% else %}
+          {% if resource.service.type == 'REST' %}
+          <input type="text" class="form-control" readonly
+          value="{{ resource.service.base_url}}/{{resource.alternate}}" id="copy-input">
+          {% else %}
+           <input type="text" class="form-control" readonly
+          value="{{ resource.service.base_url}}" id="copy-input">
+          {% endif %}
+          {% endif %}
         <span class="input-group-btn">
           <button class="btn btn-primary" type="button" id="copy-button"
               data-toggle="tooltip" data-placement="button"
               title="Copy to Clipboard">
-            Copy WMS URL
+            Copy Source URL
           </button>
         </span>
       </div>
@@ -347,7 +357,7 @@
           </div>
           <div class="modal-body">
             <div class="row edit-modal">
-              {% if "change_resourcebase_metadata" in perms_list %}
+              {% if "change_resourcebase_metadata" in perms_list and resource.storeType != "remoteStore" %}
               <div class="col-sm-4">
                 <i class="fa fa-list-alt fa-3x"></i>
                 <h4>{% trans "Metadata" %}</h4>
@@ -443,9 +453,12 @@
 
     <li class="list-group-item">
         <h4 class="list-group-item-heading">{%trans "Thumbnail" %}</h4>
-
+        {% if resource.storeType != "remoteStore" %}
         <img id="thumbnail" class="thumbnail" onerror="this.src='/static/geonode/img/missing_thumb.png'" src="/thumbnails/layers/{{ resource.typename }}"/>
-    </li>
+        {% else %}
+        <img id="thumbnail" class="thumbnail" onerror="this.src='/static/geonode/img/missing_thumb.png'" src="/thumbnails/layers/{{ resource.service_typename }}"/>
+        {% endif %}
+      </li>
     <li class="list-group-item">
       <h4>{% trans "Maps using this layer" %}</h4>
         {% if resource.maps %}

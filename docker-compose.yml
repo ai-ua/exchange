@@ -19,6 +19,8 @@ services:
     container_name: exchange
     env_file: .env
     image: bex/exchange:latest
+    build:
+      context: .
     healthcheck:
       test: ["CMD-SHELL", "curl --silent --fail localhost:8000 || exit 1"]
       interval: 15s
@@ -28,45 +30,11 @@ services:
       - 8000:8000
     depends_on:
       - db
-      - registry
       - search
-      - worker
+      - task_queue
     volumes:
       - $PWD:/code:rw  # needed for running tests and coverage
       - django_media:/app/data/media
-  worker:
-    container_name: worker
-    env_file: .env
-    image: bex/exchange:latest
-    build:
-      context: .
-      args:
-        dev: $DEV
-    environment:
-      TASK: 'worker'
-    healthcheck:
-      test: ["CMD-SHELL", "cd /code && celery inspect ping -A exchange.celery_app || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-    depends_on:
-      - task_queue
-    volumes:
-      - django_media:/app/data/media
-  registry:
-    container_name: registry
-    env_file: .env
-    image: bex/registry:latest
-    build: ./docker/registry
-    depends_on:
-      - search
-    healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:8001 || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-    ports:
-      - 8001:8001
   geoserver:
     container_name: geoserver
     build: ./docker/geoserver
@@ -116,7 +84,20 @@ services:
       - search_data:/var/lib/rabbitmq
   search:
     container_name: search
-    image: elasticsearch:2.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.1.1
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      core:
+        soft: -1
+        hard: -1
+      fsize:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - "9200:9200"
     healthcheck:

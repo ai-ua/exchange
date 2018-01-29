@@ -6,9 +6,6 @@ from . import ExchangeTest
 from exchange import settings
 from exchange.tests.osgeo_importer_upload_test import UploaderMixin
 import json
-from osgeo_importer.tasks import import_object
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 import logging
 logger = logging.getLogger(__name__)
 
@@ -180,9 +177,21 @@ class UnifiedSearchTest(ViewTestCase, UploaderMixin):
         self.expected_status = 200
 
         from geonode.layers.models import Layer
-        from osgeo_importer.models import UploadLayer
         from geonode.maps.models import Map
         from geonode.base.models import TopicCategory, Region
+
+        # Don't test the remote service we import on container creation
+        from geonode.services.models import Service
+        from django.shortcuts import get_object_or_404, Http404
+
+        try:
+            service = get_object_or_404(Service, pk=1)
+        except Http404:
+            service = None
+
+        if service:
+            service.layer_set.all().delete()
+            service.delete()
 
         # Layer
         # TODO: Upload fails sometimes especially with raster
@@ -297,7 +306,8 @@ class UnifiedSearchTest(ViewTestCase, UploaderMixin):
     # from performing GET on self.url
     def test(self):
         self.doit()
-        search_results = json.loads(self.response.content)
+        # flake8 F841
+        # search_results = json.loads(self.response.content)
 
     def test_phrase(self):
         # should be test_layer
@@ -666,7 +676,7 @@ class UnifiedSearchTest(ViewTestCase, UploaderMixin):
 class ViewFunctionTests(ViewTestCase):
 
     def test_get_unified_search_result_objects(self):
-        from exchange.views import get_unified_search_result_objects
+        from exchange.search.views import get_unified_search_result_objects
 
         test_hits = [{
             '_index': 'registry',

@@ -1,4 +1,3 @@
-from django.test import TestCase
 from tastypie.test import ResourceTestCaseMixin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from exchange import settings

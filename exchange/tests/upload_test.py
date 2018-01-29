@@ -3,16 +3,12 @@
 #
 
 
-import json
 import re
-import time
 
 from . import ExchangeTest
 from exchange.tests.osgeo_importer_upload_test import UploaderMixin
 
 import pytest
-
-from exchange import settings
 
 
 # This is a dummy exception class

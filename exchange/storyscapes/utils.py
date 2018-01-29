@@ -7,10 +7,10 @@ import datetime
 dateparts = '%Y', '%m', '%d'
 timeparts = '%H', '%M', '%S'
 _patterns = []
-for i in xrange(len(dateparts)):
+for i in xrange(len(dateparts)):  # noqa
     _patterns.append('/'.join(dateparts[0:i + 1]))
     _patterns.append('-'.join(dateparts[0:i + 1]))
-for i in xrange(len(timeparts)):
+for i in xrange(len(timeparts)):  # noqa
     time = ':'.join(timeparts[0:i + 1])
     _patterns.append('/'.join(dateparts) + 'T' + time)
     _patterns.append('-'.join(dateparts) + 'T' + time)
@@ -48,7 +48,7 @@ def parse_date_time(val):
 
 
 def unicode_csv_dict_reader(fp):
-    if isinstance(fp, basestring):
+    if isinstance(fp, basestring):  # noqa
         fp = StringIO(fp)
 
     # guess encoding, yay
@@ -69,7 +69,7 @@ def unicode_csv_dict_reader(fp):
     lines = (line.encode('utf-8')
              for line in codecs.getreader(enc)(fp, errors='ignore'))
     reader = csv.DictReader(lines)
-    return (dict([(k, unicode(v, 'utf-8'))
+    return (dict([(k, unicode(v, 'utf-8'))  # noqa
                   for k, v in row.items() if v]) for row in reader)
 
 

@@ -2,7 +2,7 @@ FROM quay.io/boundlessgeo/gdal-py-alpine
 
 EXPOSE 8001
 
-RUN git clone https://github.com/boundlessgeo/registry/ /code/vendor/registry/
+RUN git clone https://github.com/boundlessgeo/registry/ -b elasticsearch-6.x-compat /code/vendor/registry/
 
 WORKDIR /code/vendor/registry/
 
