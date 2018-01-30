@@ -119,7 +119,7 @@ node {
         docker-compose down
         docker system prune -f
         """
-      // notifyBuild(currentBuild.result)
+      notifyBuild(currentBuild.result)
     }
 
   }
