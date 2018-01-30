@@ -32,6 +32,16 @@ function sonar-scan {
               -Dsonar.python.pylint=/usr/bin/pylint
 }
 
+function makemigrations-check {
+    if [[ ! $(python manage.py makemigrations --dry-run) == "No changes detected" ]]; then
+      python manage.py makemigrations --dry-run --verbosity 3
+      echo "Please commit your migrations"
+      exit 1
+    else
+      echo "No migrations detected"
+    fi
+}
+
 # Jenkins function for exchange healthcheck
 function exchange-healthcheck {
     for i in $(seq 1 20);

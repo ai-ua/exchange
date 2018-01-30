@@ -76,18 +76,16 @@ node {
                 }
               }
             }
+            sh """
+              docker-compose logs
+            """
           }
         )
-        sh """
-          docker-compose logs
-        """
       }
 
       stage('Verify Migrations'){
         sh """
-          docker-compose exec -T exchange \
-            /bin/bash -c '[[ ! \$(python manage.py makemigrations --dry-run) == "No changes detected" ]] && \
-                          python manage.py makemigrations --dry-run --verbosity 3 && exit 1'
+          docker-compose exec -T exchange /bin/bash -c '. docker/devops/helper.sh && makemigrations-check'
         """
       }
 
@@ -148,5 +146,5 @@ def notifyBuild(String buildStatus = currentBuild.result) {
   }
 
   // Send notifications
-  // slackSend (color: colorCode, message: summary, channel: '#exchange-bots')
+  slackSend (color: colorCode, message: summary, channel: '#exchange-bots')
 }

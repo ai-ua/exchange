@@ -36,7 +36,7 @@ purge: stop
 recreate: purge
 	@docker-compose up -d --build --force-recreate
 
-test:
+test: migration-check
 	@echo "Note: test requires the exchange container to be running and healthy"
 	@docker-compose exec exchange /code/docker/exchange/run_tests.sh
 
@@ -44,3 +44,7 @@ maploom:
 	@docker run -v $(current_dir):/code \
 	            -w /code quay.io/boundlessgeo/bex-nodejs-bower-grunt bash \
 	            -e -c '. docker/devops/helper.sh && build-maploom'
+
+migration-check:
+	@docker-compose exec -T exchange /bin/bash \
+	                     -c '. docker/devops/helper.sh && makemigrations-check'

@@ -21,21 +21,30 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='message',
             name='sender',
-            field=models.ForeignKey(related_name='sent_messages', verbose_name='Sender', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                related_name='sent_messages',
+                verbose_name='Sender',
+                to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='message',
             name='sent_at',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Sent at'),
+            field=models.DateTimeField(
+                default=django.utils.timezone.now,
+                verbose_name='Sent at'),
         ),
         migrations.AlterField(
             model_name='thread',
             name='subject',
-            field=models.CharField(max_length=150, verbose_name='Subject'),
+            field=models.CharField(
+                max_length=150, verbose_name='Subject'),
         ),
         migrations.AlterField(
             model_name='thread',
             name='users',
-            field=models.ManyToManyField(to=settings.AUTH_USER_MODEL, verbose_name='Users', through='user_messages.UserThread'),
+            field=models.ManyToManyField(
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='Users',
+                through='user_messages.UserThread'),
         ),
     ]

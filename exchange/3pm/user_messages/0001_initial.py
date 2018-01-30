@@ -35,10 +35,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Message',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('sent_at', models.DateTimeField(default=django.utils.timezone.now)),
+                ('id', models.AutoField(
+                    verbose_name='ID',
+                    serialize=False,
+                    auto_created=True,
+                    primary_key=True)),
+                ('sent_at', models.DateTimeField(
+                    default=django.utils.timezone.now)),
                 ('content', models.TextField()),
-                ('sender', models.ForeignKey(related_name='sent_messages', to=settings.AUTH_USER_MODEL)),
+                ('sender', models.ForeignKey(
+                    related_name='sent_messages',
+                    to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ('sent_at',),
@@ -47,28 +54,43 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Thread',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('subject', models.CharField(max_length=150)),
+                ('id', models.AutoField(
+                    verbose_name='ID',
+                    serialize=False,
+                    auto_created=True,
+                    primary_key=True)),
+                ('subject', models.CharField(
+                    max_length=150)),
             ],
         ),
         migrations.CreateModel(
             name='UserThread',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(
+                    verbose_name='ID',
+                    serialize=False,
+                    auto_created=True,
+                    primary_key=True)),
                 ('unread', models.BooleanField()),
                 ('deleted', models.BooleanField()),
-                ('thread', models.ForeignKey(to='user_messages.Thread')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('thread', models.ForeignKey(
+                    to='user_messages.Thread')),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AddField(
             model_name='thread',
             name='users',
-            field=models.ManyToManyField(to=settings.AUTH_USER_MODEL, through='user_messages.UserThread'),
+            field=models.ManyToManyField(
+                to=settings.AUTH_USER_MODEL,
+                through='user_messages.UserThread'),
         ),
         migrations.AddField(
             model_name='message',
             name='thread',
-            field=models.ForeignKey(related_name='messages', to='user_messages.Thread'),
+            field=models.ForeignKey(
+                related_name='messages',
+                to='user_messages.Thread'),
         ),
     ]
